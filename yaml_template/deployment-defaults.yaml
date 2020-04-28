@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ deploymentName }}
+  labels:
+    app: {{ deploymentName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ deploymentName }}
+  template:
+    metadata:
+      labels:
+        app: {{ deploymentName }}
+    spec:
+      containers:
+      - image: {{& imageSrc }}
+        imagePullPolicy: Always
+        name: {{ deploymentName }}
+        ports:
+        - containerPort: {{ applicationPort }}
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ deploymentName }}-svc
+  labels:
+    app: {{ deploymentName }}
+    service: {{ deploymentName }}
+spec:
+  ports:
+  - port: 80
+    name: {{ deploymentName }}-port
+    targetPort: {{ applicationPort }}
+  selector:
+    app: {{ deploymentName }}
+  type: LoadBalancer
